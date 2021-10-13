@@ -1,9 +1,9 @@
 from docx import Document
 from docx.shared import Pt
 from expression import Expressions
+from docx.enum.text import WD_ALIGN_PARAGRAPH
 
-
-def get_document(exps : Expressions, file_name : str , with_ans : bool = False) -> None:
+def generate_test(exps : Expressions, with_ans : bool = False) -> None:
     document = Document()
         
     style = document.styles['Normal']
@@ -12,7 +12,8 @@ def get_document(exps : Expressions, file_name : str , with_ans : bool = False) 
     font.size = Pt(20)
 
     document.add_heading('Test', 0)
-    document.add_heading('                                                                              Namn: ____________________', 1)
+    header = document.add_heading('Namn: ____________________', 1)
+    header.alignment = WD_ALIGN_PARAGRAPH.RIGHT
 
     table = document.add_table(rows=0, cols=exps.ncol)
 
@@ -28,4 +29,4 @@ def get_document(exps : Expressions, file_name : str , with_ans : bool = False) 
                 
             row_cells[j].text = cell
 
-    document.save(f'{file_name}')
+    return document

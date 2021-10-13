@@ -2,18 +2,25 @@
 import random
 
 _INPUT_STR = "_____"
-SIGNS = ["×", "+", "-", "/"]
+OPERATORS = ["×", "+", "-", "/"]
 
+
+class NoOperatorsError(Exception):
+    """Raised when the input operators are empty."""
+    pass
 class Expressions:
 
-    def  __init__(self, nrow, ncol, signs, repeating):
+    def  __init__(self, nrow, ncol, operators, repeating):
 
+        
         self.nrow = nrow
         self.ncol = ncol
         self.N = self.nrow * self.ncol
-        self.signs = signs
+        self.operators = operators
         self.repeating = repeating
         self.expressions = []
+
+        self._check_input()
 
         exp_types = {
             "+": Addition,
@@ -26,7 +33,10 @@ class Expressions:
         else:
             self._set_non_repeating_exps(exp_types)
 
-
+    def _check_input(self):
+        if len(self.operators) == 0:
+            raise NoOperatorsError("[operators] cannot be empty.")
+        
     def _set_repeating_exps(self, exp_types):
 
         self.expressions = [exp_types[self._random_sign()](random.randint(1, 10), random.randint(1, 10)) for i in range(self.N)]
@@ -42,7 +52,7 @@ class Expressions:
         
         
     def _random_sign(self):
-        return self.signs[random.randint(0, len(self.signs)) - 1]
+        return self.operators[random.randint(0, len(self.operators)) - 1]
 
 
 class Addition:

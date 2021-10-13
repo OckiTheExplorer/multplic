@@ -1,48 +1,37 @@
 import streamlit as st
-from expression import SIGNS
+from expression import OPERATORS
 from expression import Expressions
-from GetDocument import get_document
-import base64
+from expression import NoOperatorsError
+from test_generator import generate_test
+from download import download_document
 
-
-def download_document(file):
-    """Generates a link allowing the data in a given panda dataframe to be downloaded
-    in:  dataframe
-    out: href string
-    """
-    
-    with open(file, "rb") as f:
-        #Read the whole file at once
-        data = f.read()
-    b64 = base64.b64encode(data).decode()
-
-    f.close()
-    # b64 = base64.b64encode(data).decode()  # some strings <-> bytes conversions necessary here
-    href = f'<a href="data:file/csv;base64,{b64}" download="math_test.docx">Download {file} </a>'
-    # href = f'<a href="data:file/csv;base64,{b64}">Download CSV File</a> (right-click and save as &lt;some_name&gt;.csv)'
-    return href
-
-nrows = st.sidebar.number_input("Rows: ", 1, 14, 14)
-ncols = st.sidebar.number_input("Columns: ", 1, 3, 3)
-signs = st.sidebar.multiselect("Opperators: ", SIGNS, SIGNS)
-repeating = st.sidebar.checkbox("Repeating: ", False)
+nrows = st.sidebar.number_input("Rows: ", 1, 14, 14,help="Number of rows with math problems")
+ncols = st.sidebar.number_input("Columns: ", 1, 3, 3, help="Number of columns with math problems")
+operators = st.sidebar.multiselect("Operators: ", OPERATORS, OPERATORS, help="The type of math problems that should be included")
+repeating = st.sidebar.checkbox("Repeating problems: ", False, help="If the same math problem can show up more than once")
 
 st.title("Math Test Generator")
 
+st.write(f"A test with {int(nrows*ncols)} math problems will be generated.")
+
 button_pressed = st.button("Generate test")
+try:
+    if button_pressed:
+        
+        exps = Expressions(nrows, ncols, operators, repeating)
 
-if button_pressed:
-    
-    exps = Expressions(nrows, ncols, signs, repeating)
+        test_document = generate_test(exps)
+        key_document = generate_test(exps, with_ans=True)
 
-    get_document(exps, "test.docx")
-    get_document(exps, "facit.docx", with_ans=True)
+        test_link = download_document(test_document, "math_test.docx")
+        key_link = download_document(key_document, "math_test_key.docx")
 
-    test_link = download_document("test.docx")
-    facit_link = download_document("facit.docx")
+        st.markdown(test_link, unsafe_allow_html=True)
+        st.markdown(key_link, unsafe_allow_html=True)
+except NoOperatorsError:
+    st.write("A test cannot be generate without operators.")
 
-    st.markdown(test_link, unsafe_allow_html=True)
-
-    st.markdown(facit_link, unsafe_allow_html=True)
+except:
+    st.write("Ops! Something went wrong. Try to  generate a new test with different settings.")
     
 
