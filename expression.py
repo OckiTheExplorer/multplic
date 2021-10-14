@@ -8,14 +8,22 @@ OPERATORS = ["×", "+", "-", "/"]
 class NoOperatorsError(Exception):
     """Raised when the input operators are empty."""
     pass
+
+
+class NotEnoughMathProblems(Exception):
+    """Raised when nrow*ncol is smaller than max_problems."""
+    pass
 class Expressions:
 
-    def  __init__(self, nrow, ncol, operators, repeating):
-
-        
+    def  __init__(self, nrow, ncol, operators, lhs_ints, rhs_ints, repeating):
         self.nrow = nrow
         self.ncol = ncol
         self.N = self.nrow * self.ncol
+
+        self.lhs_ints = lhs_ints
+        self.rhs_ints = rhs_ints
+        self.max_problems = len(lhs_ints) * len(rhs_ints) * len(operators)
+
         self.operators = operators
         self.repeating = repeating
         self.expressions = []
@@ -35,16 +43,20 @@ class Expressions:
 
     def _check_input(self):
         if len(self.operators) == 0:
-            raise NoOperatorsError("[operators] cannot be empty.")
+            raise NoOperatorsError("A test cannot be generate without operators.")
+
+        if self.max_problems < self.N and not self.repeating:
+            raise NotEnoughMathProblems(f"Not enough math problems. {self.max_problems}, the number of possible math problems must be equal to or greater than the number of requested math problems {self.N}")
         
     def _set_repeating_exps(self, exp_types):
 
-        self.expressions = [exp_types[self._random_sign()](random.randint(1, 10), random.randint(1, 10)) for i in range(self.N)]
+        self.expressions = [exp_types[self._random_sign()](self._random_int(self.lhs_ints), self._random_int(self.rhs_ints)) for i in range(self.N)]
 
     def _set_non_repeating_exps(self, exp_types):
+
         records_dict = {}
         while len(records_dict) < self.N:
-            record = exp_types[self._random_sign()](random.randint(1, 10), random.randint(1, 10))
+            record = exp_types[self._random_sign()](self._random_int(self.lhs_ints), self._random_int(self.rhs_ints))
             records_dict[record.txt] = record
 
         self.expressions = list(records_dict.values())
@@ -53,6 +65,9 @@ class Expressions:
         
     def _random_sign(self):
         return self.operators[random.randint(0, len(self.operators)) - 1]
+
+    def _random_int(self, ints):
+        return ints[random.randint(0, len(ints)) - 1]
 
 
 class Addition:
