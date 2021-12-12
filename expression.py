@@ -26,6 +26,7 @@ class Expressions:
 
         self.operators = operators
         self.repeating = repeating
+
         self.expressions = []
 
         self._check_input()
@@ -36,17 +37,19 @@ class Expressions:
             "×": Multiplication,
             "/": Division}
 
+        
+
         if repeating:
             self._set_repeating_exps(exp_types)
         else:
             self._set_non_repeating_exps(exp_types)
-
+            
     def _check_input(self):
         if len(self.operators) == 0:
             raise NoOperatorsError("A test cannot be generate without operators.")
 
         if self.max_problems < self.N and not self.repeating:
-            raise NotEnoughMathProblems(f"Not enough math problems. {self.max_problems}, the number of possible math problems must be equal to or greater than the number of requested math problems {self.N}")
+            raise NotEnoughMathProblems(f"Not enough math problems. The number of possible math problems, {self.max_problems}, must be equal to or greater than the number of requested math problems, {self.N}.")
         
     def _set_repeating_exps(self, exp_types):
 
@@ -56,12 +59,13 @@ class Expressions:
 
         records_dict = {}
         while len(records_dict) < self.N:
+
+
             record = exp_types[self._random_sign()](self._random_int(self.lhs_ints), self._random_int(self.rhs_ints))
+            
             records_dict[record.txt] = record
 
         self.expressions = list(records_dict.values())
-
-        
         
     def _random_sign(self):
         return self.operators[random.randint(0, len(self.operators)) - 1]
@@ -76,8 +80,9 @@ class Addition:
 
         self.x = x
         self.y = y
+        self.rhs = x + y
         self.txt = f"{x} + {y} = {_INPUT_STR}"        
-        self.answer = f"{x} + {y} = {x + y}"
+        self.answer = f"{x} + {y} = {self.rhs}"
 
 class Subtraction:
 
@@ -85,8 +90,9 @@ class Subtraction:
 
         self.x = x
         self.y = y
+        self.rhs = x - y
         self.txt = f"{x} - {y} = {_INPUT_STR}"        
-        self.answer = f"{x} - {y} = {x - y}"
+        self.answer = f"{x} - {y} = {self.rhs}"
 
 class Multiplication:
 
@@ -94,14 +100,16 @@ class Multiplication:
 
         self.x = x
         self.y = y
+        self.rhs = x * y
         self.txt = f"{x} × {y} = {_INPUT_STR}"        
-        self.answer = f"{x} × {y} = {x * y}"
+        self.answer = f"{x} × {y} = {self.rhs}"
 
 class Division:
 
-    def __init__(self, x, y):
+    def __init__(self, divident, rhs):
 
-        self.x = x
-        self.y = y
-        self.txt = f"{x} / {y} = {_INPUT_STR}"        
-        self.answer = f"{x} / {y} = {round(x / y, 2)}"
+        self.rhs = rhs
+        self.y = divident
+        self.x = divident * rhs
+        self.txt = f"{self.x} / {self.y} = {_INPUT_STR}"        
+        self.answer = f"{self.x} / {self.y} = {self.rhs}"

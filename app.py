@@ -23,12 +23,13 @@ rhs_ints = st.sidebar.multiselect(
 repeating = st.sidebar.checkbox(
     'Repeating problems: ', False,
      help='If the same math problem can show up more than once')
-
+     
 st.title('Math Test Generator')
 
 st.write(f'A test with {int(nrows*ncols)} math problems will be generated.')
 
 button_pressed = st.button('Generate test')
+
 try:
     if button_pressed:
         exps = Expressions(nrows, ncols, operators, lhs_ints, rhs_ints, repeating)
@@ -49,6 +50,6 @@ except NotEnoughMathProblems as error:
     st.write(str(error))
 
 except:
-    st.write('Ops! Something went wrong. Try to  generate a new test with different settings.')
+    st.write('Ops! Something went wrong. Try to generate a new test with different settings.')
     
 
